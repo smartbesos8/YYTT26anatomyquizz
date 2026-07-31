@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yin Yoga Mock Exam Quiz — Open-Ended Topics</title>
+<style>
+  :root{
+    --bg:#15161a; --card:#1d1f26; --card2:#242731; --border:#333644; --border-strong:#454a5c;
+    --text:#eceef2; --text-secondary:#a4a9b8; --text-muted:#767c8f;
+    --accent:#7f9cf5; --accent-bg:#26304d; --accent-text:#a9bdfb;
+    --success:#3ecf8e; --success-bg:#123528; --success-text:#7bdcb2;
+    --danger:#f2657a; --danger-bg:#3a1c22; --danger-text:#f79bab;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:2rem 1rem 4rem; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;
+  }
+  .wrap{max-width:640px; margin:0 auto;}
+  h1{font-size:20px; font-weight:600; margin:0 0 4px;}
+  .sub{font-size:14px; color:var(--text-secondary); margin:0 0 2rem;}
+  .topbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;}
+  .qcount{font-size:13px; color:var(--text-secondary);}
+  .topic{font-size:12px; padding:3px 10px; border-radius:8px; background:var(--accent-bg); color:var(--accent-text);}
+  .progress{height:4px; background:var(--card2); border-radius:2px; margin-bottom:1.5rem; overflow:hidden;}
+  .progress-fill{height:100%; background:var(--accent); transition:width .2s ease;}
+  .question{font-size:17px; font-weight:600; margin:0 0 1rem;}
+  .opts{display:flex; flex-direction:column; gap:8px;}
+  .opt{
+    display:flex; gap:10px; align-items:flex-start; text-align:left; width:100%;
+    padding:12px 14px; background:var(--card); border:1px solid var(--border); border-radius:8px;
+    color:var(--text); font-size:14px; cursor:pointer; font-family:inherit;
+  }
+  .opt:hover:not(:disabled){border-color:var(--border-strong);}
+  .opt:disabled{cursor:default;}
+  .opt.correct{border-color:var(--success); background:var(--success-bg);}
+  .opt.wrong{border-color:var(--danger); background:var(--danger-bg);}
+  .opt .letter{font-weight:600; color:var(--text-secondary); min-width:16px;}
+  .opt .tag{margin-left:auto; font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px;}
+  .opt.correct .tag{background:var(--success); color:#06251a;}
+  .opt.wrong .tag{background:var(--danger); color:#3a0a12;}
+  .feedback{margin-top:1rem; padding:1rem 1.25rem; background:var(--card2); border-radius:12px; border:1px solid var(--border);}
+  .feedback .verdict{margin:0 0 8px; font-size:14px; font-weight:600;}
+  .feedback .verdict.good{color:var(--success-text);}
+  .feedback .verdict.bad{color:var(--danger-text);}
+  .feedback ul{margin:0 0 10px; padding-left:18px; font-size:13px; color:var(--text-secondary);}
+  .feedback ul li{margin-bottom:4px;}
+  .feedback .note{margin:0; font-size:13px; color:var(--text-secondary); border-top:1px solid var(--border); padding-top:8px;}
+  .feedback .note b{color:var(--text);}
+  .actions{display:flex; justify-content:flex-end; margin-top:1.25rem;}
+  button.next, button.restart{
+    background:var(--accent-bg); color:var(--accent-text); border:1px solid var(--border-strong);
+    padding:10px 18px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit;
+  }
+  button.next:hover, button.restart:hover{background:#2d3a5c;}
+  .summary{text-align:center; padding:1rem 0;}
+  .summary .label{font-size:13px; color:var(--text-secondary); margin:0 0 4px;}
+  .summary .score{font-size:36px; font-weight:700; margin:0 0 4px;}
+  .summary .pct{font-size:14px; color:var(--text-secondary); margin:0 0 2rem;}
+  .revisit-title{font-size:13px; font-weight:600; color:var(--text-secondary); margin:0 0 8px; text-align:left;}
+  .revisit{padding:10px 12px; background:var(--card); border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--text-secondary); margin-bottom:6px; text-align:left;}
+  .revisit b{color:var(--text);}
+  .center{display:flex; justify-content:center; margin-top:1.5rem;}
+  .gaps{margin-top:2.5rem; padding-top:1.5rem; border-top:1px solid var(--border); font-size:13px; color:var(--text-muted);}
+  .gaps b{color:var(--text-secondary);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Yin yoga mock exam — open-ended topics quiz</h1>
+  <p class="sub">26 new multiple-choice questions covering the same topics as questions 1–26 of the mock exam.</p>
+  <div id="quiz-root"></div>
+</div>
+
+<script>
+const QUESTIONS = [
+{topic:"Philosophy",q:"In yin yoga teaching, what separates a functional approach from an aesthetic approach?",opts:["Functional: adjust the pose until you feel it in the target area. Aesthetic: adjust the pose until it matches a textbook shape.","Functional approach uses props; aesthetic approach never does.","Aesthetic approach is only for restorative yoga; functional is only for yin.","They're the same approach, just different studio names."],correct:0,info:["Functional = sensation-based: “we use the pose to get into the body, not the body to get into the pose.”","Aesthetic = appearance-based: everyone aims for the same generalized alignment.","Functional suits most students seeking health; aesthetic suits professions where a specific look matters."],notes:["Exactly — “if you're feeling it, you're doing it” sums up the functional approach.","Props can appear in either approach — that's not the distinguishing factor.","Both terms apply across styles; the split is feel vs. appearance, not style.","They describe genuinely different teaching philosophies, not synonyms."]},
+{topic:"Philosophy",q:"Yoga Sutra 1.2 states ‘yogash chitta-vrtti-nirodha.’ What does this mean?",opts:["Yoga is the union of breath and movement.","Yoga is the stilling of the fluctuations of the mind.","Yoga is a physical practice for flexibility and strength.","Yoga is the release of karma through devotion."],correct:1,info:["Chitta = the conscious + subconscious mind, like the surface of a pond.","Vrittis = the “waves” on that surface — sensations, emotions, thoughts.","Nirodha = control/stilling — yoga quiets those fluctuations."],notes:["Closer to a popular reading of “hatha” (sun/moon union), not sutra 1.2.","Correct — this is the classical definition from the Yoga Sutras.","That's a modern, fitness-focused reading, not the sutra's meaning.","That fits devotional (bhakti) yoga more than this sutra."]},
+{topic:"Philosophy",q:"Which yama literally translates to ‘truthfulness’?",opts:["Ahimsa","Satya","Asteya","Aparigraha"],correct:1,info:["Satya = truthfulness / tell the truth — one of the five yamas (ethical restraints).","Note: the source notes only cover the literal translation for Satya — how it plays out ‘in life’ isn't detailed yet."],notes:["Ahimsa means non-violence, not truthfulness.","Correct — Satya is the truthfulness yama.","Asteya means non-stealing.","Aparigraha means non-attachment / non-greed."]},
+{topic:"Philosophy",q:"In the yogic model of the three bodies, what characterizes the astral body?",opts:["The realm of pure matter and physical sensation.","The realm of emotion, desire, and imagination — coloured by like and dislike.","The realm of abstract thought and causal ideas only.","It doesn't appear in this model."],correct:1,info:["Three bodies: causal (thought/ideas), astral (emotion/desire), physical (matter).","Astral body = emotions, desires, imagination, personal concerns.","Astral thinking is “coloured by like and dislike.”"],notes:["That describes the physical body, not the astral body.","Correct — astral = emotion and desire.","That describes the causal body.","It's one of the three core bodies in this model."]},
+{topic:"Chakras",q:"The Manipura chakra governs will and self-esteem. What does an excessive Manipura look like?",opts:["Low energy, weak will, easily manipulated.","Cold, passive, victim mentality.","Domineering, controlling, quick temper, power-hungry.","Calm confidence with a good sense of humour."],correct:2,info:["Manipura = Fire element, Solar Plexus, colour yellow — governs autonomy, will, self-esteem, power.","Balanced: responsible, confident, meets challenges well.","Deficient: low energy, weak will, victim mentality.","Excessive: aggressive, controlling, manipulative, temper tantrums."],notes:["That's a deficient Manipura, the opposite of excessive.","That's also a deficient pattern, not excessive.","Correct — excess shows up as domination and power-hunger.","That describes a balanced Manipura."]},
+{topic:"TCM",q:"Which statement correctly describes a relationship between yin and yang?",opts:["They oppose each other, but also transform into one another over time.","Once something is yin, it can never become yang.","Yin and yang exist completely independently of one another.","Yang always cancels yin out entirely."],correct:0,info:["Four properties: they oppose, depend on, counterbalance, and transform into each other.","Yin = shadow side (cold, dark, rest, moon); Yang = sunny side (warmth, light, activity, sun).","They only exist in relation to each other — neither exists alone."],notes:["Correct — opposition plus transformation are two of the four core properties.","Transformation into each other is one of the four properties — this statement is false.","They're mutually dependent, not independent — also one of the four properties.","They counterbalance, not cancel out — balance, not elimination."]},
+{topic:"TCM",q:"What is ‘chi’ (qi) best translated as in Chinese medicine?",opts:["Blood circulation only.","Vital energy / life force.","A specific organ in the body.","The physical structure of muscle tissue."],correct:1,info:["The character combines “air” + “rice” — like steam rising off cooking rice.","Best translation: vital energy or life force.","Functions include transformation, transportation, protection, and warming the body."],notes:["Blood is a related but separate substance in TCM — chi is broader.","Correct — chi is vital energy / life force.","Chi isn't an organ; it's an energetic concept flowing through the body.","That's tissue anatomy, not the TCM concept of chi."]},
+{topic:"TCM",q:"In Chinese medicine, which emotion is paired with the Earth element?",opts:["Anger","Joy","Worry","Fear"],correct:2,info:["Five Emotions map to Five Elements: Wood-Anger, Fire-Joy, Earth-Worry, Metal-Sorrow, Water-Fear.","Earth's yin organ is the Spleen — worry is said to affect Spleen function."],notes:["Anger pairs with Wood/Liver.","Joy pairs with Fire/Heart.","Correct — Worry pairs with Earth/Spleen.","Fear pairs with Water/Kidney."]},
+{topic:"TCM",q:"According to Chinese medicine, what is a function of the Pericardium?",opts:["It filters waste from the blood.","It protects the Heart from pathogens and emotional disturbance, and houses part of the Shen (spirit).","It produces Qi from digested food.","It regulates bone marrow production."],correct:1,info:["Pericardium = “protector of the Heart” — shields it from pathogens and emotional shock.","Also said to control blood.","Considered a residence of Shen (spirit) alongside the Heart."],notes:["That's closer to a Kidney/Bladder function in TCM framing.","Correct — protecting the Heart is the Pericardium's core role.","Qi transformation from food is a Spleen/Stomach function.","Bone marrow isn't part of the Pericardium's TCM function."]},
+{topic:"TCM",q:"Where does the Pericardium meridian end?",opts:["At the tip of the thumb.","At the tip of the middle finger, with a branch to the ring finger.","At the sole of the foot.","Behind the ear."],correct:1,info:["Starts at the centre of the chest, connects to the Pericardium organ, descends through the diaphragm.","Runs down the inner arm.","Ends at the tip of the middle finger, with a small branch to the ring finger connecting to San Jiao."],notes:["The thumb is the Lung meridian's endpoint, not Pericardium's.","Correct — middle finger tip, branching to the ring finger.","Foot endpoints belong to leg meridians — Pericardium is an arm meridian.","Not part of the Pericardium meridian's pathway."]},
+{topic:"TCM",q:"Which pair of meridians is associated with the Earth element?",opts:["Liver (yin) and Gallbladder (yang)","Spleen (yin) and Stomach (yang)","Heart (yin) and Small Intestine (yang)","Kidney (yin) and Bladder (yang)"],correct:1,info:["Earth's yin organ: Spleen. Yang organ: Stomach.","Season: Late Summer. Colour: yellow. Climate: damp. Flavour: sweet.","Emotion: Worry."],notes:["Liver/Gallbladder is the Wood element pair.","Correct — Spleen and Stomach are the Earth pair.","Heart/Small Intestine is the Fire element pair.","Kidney/Bladder is the Water element pair."]},
+{topic:"TCM",q:"Which season is traditionally associated with the Earth element?",opts:["Winter","Late summer","Spring","Autumn"],correct:1,info:["Earth element season: Late Summer, a transitional period.","Some teachings frame Earth as the ~18-day transitional windows between all four seasons.","Associated emotion: Worry."],notes:["Winter pairs with Water.","Correct — Late Summer is Earth's season.","Spring pairs with Wood.","Autumn pairs with Metal."]},
+{topic:"Yin poses",q:"Which yin yoga pose is commonly used to stimulate the Earth element meridians?",opts:["Saddle","Sphinx","Shoelace","Melting Heart"],correct:0,info:["Deep stretches of the thighs and front torso work the Stomach/Spleen (Earth) meridians.","Saddle stretches the quads/front thigh — a direct line along the Stomach meridian.","Child's Pose, Frog, and Deer also touch Stomach/Spleen lines to varying degrees."],notes:["Correct — Saddle's deep quad/front-thigh stretch runs along the Stomach meridian.","Sphinx targets the lower back/lumbar area more than Earth meridians specifically.","Shoelace relates more to hips/Gallbladder (Wood) and Bladder lines.","Melting Heart opens the shoulders/upper back, not the Earth pathway."]},
+{topic:"Nervous system",q:"What best distinguishes the sympathetic from the parasympathetic nervous system?",opts:["Sympathetic = rest-and-digest; parasympathetic = fight-or-flight.","Sympathetic = fight-or-flight, raises heart rate; parasympathetic = rest-and-digest, lowers heart rate.","They control only voluntary muscle movement.","There's no functional difference between them."],correct:1,info:["Sympathetic (yang-like): fight-or-flight — raises heart rate, dilates pupils/bronchi, inhibits digestion.","Parasympathetic (yin-like): rest-and-digest — lowers heart rate, stimulates digestion, works via the vagus nerve.","Sympathetic: amygdala → hypothalamus → adrenal glands (adrenaline/cortisol). Parasympathetic: acetylcholine."],notes:["This has it backwards — sympathetic is fight-or-flight, parasympathetic is rest-and-digest.","Correct.","Both are part of the autonomic (involuntary) nervous system, not voluntary control.","They're functionally opposite branches of the autonomic nervous system."]},
+{topic:"Nervous system",q:"Which branch of the nervous system activates during stress?",opts:["Parasympathetic","Sympathetic","Somatic","Enteric"],correct:1,info:["Sympathetic nervous system drives the fight-or-flight stress response.","Triggered via amygdala → hypothalamus → pituitary → adrenal glands, releasing adrenaline and cortisol.","Sits between the calm ‘ventral vagal’ state and the shutdown ‘dorsal vagal’ freeze state in polyvagal theory."],notes:["Parasympathetic is the calming, rest-and-digest branch — the opposite of stress response.","Correct — sympathetic activation is the stress response.","Somatic nervous system controls voluntary movement, not the stress response.","Enteric nervous system governs the gut, not the general stress response."]},
+{topic:"Meditation",q:"How is meditation described in the course material?",opts:["A technique for stretching muscles more deeply.","Coming home to your true nature — relaxing, landing in yourself, and letting go of the conditioned mind's habitual patterns.","A purely physical relaxation exercise with no attentional component.","A method to induce sleep during practice."],correct:1,info:["“Meditation is about coming home to the openness and richness of your True nature.”","It requires relaxing and letting go of attachment to the conditioned mind's assumptions.","Not just relaxing attention — also staying awake and attentive; too loose = dull, too tight = insufficient softness."],notes:["That describes a physical yin yoga practice, not meditation.","Correct — matches the course's own description.","Meditation requires both relaxation and attentiveness, not just stillness.","Meditation aims for wakeful presence, not sleep."]},
+{topic:"Anatomy",q:"How many vertebrae does the lumbar spine typically have?",opts:["Four","Five","Seven","Twelve"],correct:1,info:["Five lumbar vertebrae is the average/typical count.","Natural variation exists — roughly 1% of people have four or six, often trading off against thoracic count.","Sits between the thoracic spine (12 vertebrae) and the sacrum."],notes:["Four is a rare variant, not the typical count.","Correct — five is standard.","Seven is the cervical spine's vertebra count.","Twelve is the thoracic spine's vertebra count."]},
+{topic:"Anatomy",q:"What is the lowest vertebra in the lumbar spine called?",opts:["L1","C7","L5","S1"],correct:2,info:["L5 is the fifth and final lumbar vertebra.","Sits directly on top of the sacrum, forming the L5/S1 joint.","This junction is a common site of mechanical load in the spine."],notes:["L1 is the topmost lumbar vertebra, not the lowest.","C7 is the lowest cervical vertebra, in the neck.","Correct — L5 is the lowest lumbar vertebra.","S1 is the first sacral segment, just below L5, not part of the lumbar spine itself."]},
+{topic:"Anatomy",q:"What are the two types of curves found in the spine?",opts:["Lordotic and kyphotic","Primary and secondary","Convex and flat","Anterior and posterior only"],correct:0,info:["Lordotic (lordosis) = backward curve — cervical and lumbar spine.","Kyphotic (kyphosis) = forward curve — thoracic spine and sacrum.","The spine has four curves total, but only these two curve types."],notes:["Correct — lordotic and kyphotic are the two curve types.","‘Primary/secondary’ isn't the terminology used in this course's material.","Convex/flat isn't how these curves are classified here.","Anterior/posterior describes direction, not the lordotic/kyphotic curve types."]},
+{topic:"Anatomy",q:"How many distinct movements can the wrist make?",opts:["Two: flexion and extension only.","Four: flexion, extension, radial flexion, ulnar flexion.","Six, including internal and external rotation.","Three: flexion, extension, and rotation."],correct:1,info:["Wrist movements: flexion, extension, radial flexion, ulnar flexion — four total.","Important: the wrist itself does not rotate.","Rotation (supination/pronation) is a movement of the radius/forearm, not the wrist joint."],notes:["Only two of the four documented movements — missing the side-to-side deviations.","Correct — four movements, and notably no rotation.","The wrist doesn't rotate — that's a forearm movement.","Rotation isn't a wrist movement in this course's vocabulary."]},
+{topic:"Anatomy",q:"Which of these is one of the recognised types of fascia?",opts:["Cardiac fascia","Superficial fascia","Neural fascia","Lymphatic fascia"],correct:1,info:["Types include: superficial, perifascia, deep, myofascia, visceral, and meningeal fascia.","Superficial fascia sits just under the skin; deep fascia wraps muscles/muscle groups.","Visceral fascia surrounds organs; meningeal fascia surrounds the nervous system."],notes:["‘Cardiac fascia’ isn't one of the recognised types in this material.","Correct — superficial fascia is one of the six documented types.","‘Neural fascia’ isn't used here — meningeal fascia covers the nervous system.","‘Lymphatic fascia’ isn't one of the documented types."]},
+{topic:"Anatomy",q:"What does a tendon connect, and how does it differ from a ligament?",opts:["Tendon connects bone to bone; ligament connects muscle to bone.","Tendon connects muscle to bone; ligament connects bone to bone.","Both connect muscle to muscle.","Tendon connects skin to muscle; ligament connects muscle to bone."],correct:1,info:["A tendon forms where fascia thickens (myotendinous junction) and joins muscle to bone.","A ligament binds bone to bone, stabilizing joints.","Of tissues resisting movement: joint capsule/ligaments ~47%, muscle+fascia ~41%, tendon ~10%, skin ~2%."],notes:["This swaps the definitions — tendon is muscle-to-bone, ligament is bone-to-bone.","Correct.","Neither tendons nor ligaments connect muscle to muscle.","Tendons don't connect skin to muscle — that's not their role."]},
+{topic:"Anatomy",q:"What is collagen and what does it do in the body?",opts:["A hormone that regulates blood sugar.","A fibrous structural protein that's strong and resists stretching, found in skin, bone, tendon, and ligament.","A type of fascia found only around organs.","An enzyme that breaks down muscle tissue."],correct:1,info:["Collagen means ‘glue producer’ in Greek — it helps hold the body together.","Unlike most proteins, it's fibrous and resists stretching rather than clumping.","Tendons/ligaments stretch only ~4-10% because they're largely collagen."],notes:["That describes something like insulin — collagen isn't a hormone.","Correct — collagen is a structural, tension-resistant protein.","Fascia is a broader connective tissue category; collagen is the protein giving it strength.","Collagen builds/supports tissue — it isn't a breakdown enzyme."]},
+{topic:"Anatomy",q:"When the triceps contract, which segments move and what happens?",opts:["The scapula rotates upward.","The humerus and ulna extend.","The radius flexes.","The femur extends."],correct:1,info:["Triceps origin: humerus and scapula. Insertion: ulna (olecranon).","Contraction extends both the humerus and the ulna — straightens the elbow.","The primary elbow-extensor action in this course's segment vocabulary."],notes:["Scapular rotation is driven by muscles like trapezius/serratus anterior, not triceps.","Correct — humerus and ulna extension.","The radius isn't the segment moved by triceps contraction.","The femur is a leg bone — unrelated to the triceps."]},
+{topic:"Special populations",q:"A student who is 9 weeks pregnant joins your yin yoga class. What's the most appropriate guidance?",opts:["Push for a deeper stretch than usual since relaxin will make it easier.","Encourage inversions to help with early pregnancy nausea.","Don't increase range of motion beyond her pre-pregnancy level, and be cautious with deep hip openers like Butterfly and Straddle.","No adjustments are needed until the third trimester."],correct:2,info:["9 weeks = first trimester.","Relaxin rises in the first trimester, softening connective tissue (especially the pubic symphysis) — easy to go too deep without realizing it.","Rule of thumb: comfort and baby's wellbeing over depth; recommend a qualified prenatal teacher and checking with her healthcare provider.","Inversions are generally avoided in pregnancy."],notes:["Backwards — relaxin's softening effect is a reason to hold back, not push deeper.","Inversions are generally avoided during pregnancy, not encouraged.","Correct — caution and no extra depth, especially in abduction poses.","First-trimester relaxin means adjustments matter from early on, not just the third trimester."]},
+{topic:"Muscle groups",q:"In this course's Thigh mandala vocabulary, how many muscle groups make up the thigh, and how many muscles are in the Quadriceps group?",opts:["3 groups; Quadriceps has 3 muscles.","4 groups; Quadriceps has 4 muscles (Vastus Lateralis, Vastus Medialis, Vastus Intermedius, Rectus Femoris).","5 groups; Quadriceps has 2 muscles.","4 groups; Quadriceps has 10 muscles."],correct:1,info:["Thigh mandala = 4 groups: Groin/Adductors (5 muscles), Quadriceps (4), Glutes/IT Band (10), Hamstrings (4).","Quadriceps: Vastus Lateralis, Vastus Medialis, Vastus Intermedius, Rectus Femoris.","Rectus Femoris also appears in Hip Flexors since it crosses both hip and knee — a common exam trap.","Gap flag: which meridian maps to each specific group isn't spelled out group-by-group in the notes yet."],notes:["The thigh has 4 groups in this vocabulary, not 3.","Correct — 4 groups total, Quadriceps has exactly these 4 muscles.","5 groups conflates Hip Flexors (a separate, torso-connecting group) with the 4 core thigh groups.","10 muscles is the Glutes/IT Band count, not Quadriceps."]}
+];
+
+let idx=0, score=0, answered=new Array(QUESTIONS.length).fill(null);
+
+function letter(i){return String.fromCharCode(65+i);}
+
+function render(){
+  const root=document.getElementById('quiz-root');
+  if(idx>=QUESTIONS.length){renderSummary(root);return;}
+  const item=QUESTIONS[idx];
+  const picked=answered[idx];
+  const pct=Math.round((idx/QUESTIONS.length)*100);
+  let html='';
+  html+='<div class="topbar"><span class="qcount">Question '+(idx+1)+' of '+QUESTIONS.length+'</span><span class="topic">'+item.topic+'</span></div>';
+  html+='<div class="progress"><div class="progress-fill" style="width:'+pct+'%;"></div></div>';
+  html+='<p class="question">'+item.q+'</p>';
+  html+='<div class="opts">';
+  item.opts.forEach((opt,i)=>{
+    let cls='opt';
+    if(picked!==null){
+      if(i===item.correct)cls+=' correct';
+      else if(i===picked)cls+=' wrong';
+    }
+    html+='<button data-i="'+i+'" class="'+cls+'" '+(picked!==null?'disabled':'')+'>';
+    html+='<span class="letter">'+letter(i)+'</span><span>'+opt+'</span>';
+    if(picked!==null && i===item.correct){html+='<span class="tag">correct</span>';}
+    else if(picked!==null && i===picked){html+='<span class="tag">your answer</span>';}
+    html+='</button>';
+  });
+  html+='</div>';
+  if(picked!==null){
+    const isCorrect=picked===item.correct;
+    html+='<div class="feedback">';
+    html+='<p class="verdict '+(isCorrect?'good':'bad')+'">'+(isCorrect?'Correct.':'Not quite.')+'</p>';
+    html+='<ul>';
+    item.info.forEach(b=>{html+='<li>'+b+'</li>';});
+    html+='</ul>';
+    if(!isCorrect){
+      html+='<p class="note"><b>About option '+letter(picked)+':</b> '+item.notes[picked]+'</p>';
+    }
+    html+='</div>';
+    html+='<div class="actions"><button class="next" id="next-btn">'+(idx===QUESTIONS.length-1?'See results':'Next question →')+'</button></div>';
+  }
+  root.innerHTML=html;
+  if(picked===null){
+    root.querySelectorAll('.opt').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const i=parseInt(btn.getAttribute('data-i'));
+        answered[idx]=i;
+        if(i===item.correct)score++;
+        render();
+      });
+    });
+  }else{
+    const nb=document.getElementById('next-btn');
+    if(nb)nb.addEventListener('click',()=>{idx++;render();});
+  }
+}
+
+function renderSummary(root){
+  const pct=Math.round((score/QUESTIONS.length)*100);
+  let html='<div class="summary">';
+  html+='<p class="label">Quiz complete</p>';
+  html+='<p class="score">'+score+' / '+QUESTIONS.length+'</p>';
+  html+='<p class="pct">'+pct+'% correct</p>';
+  html+='</div>';
+  const missed=QUESTIONS.map((q,i)=>({q,i})).filter(x=>answered[x.i]!==x.q.correct);
+  if(missed.length){
+    html+='<p class="revisit-title">Topics to revisit</p>';
+    missed.forEach(x=>{
+      html+='<div class="revisit"><b>'+x.q.topic+':</b> '+x.q.q+'</div>';
+    });
+  }
+  html+='<div class="center"><button class="restart" id="restart-btn">Retake quiz</button></div>';
+  root.innerHTML=html;
+  document.getElementById('restart-btn').addEventListener('click',()=>{idx=0;score=0;answered=new Array(QUESTIONS.length).fill(null);render();});
+}
+
+render();
+</script>
+</body>
+</html>
